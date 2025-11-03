@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('meetings/create', 'meetings.create-meeting')->name('meetings.create');
 
+    Volt::route('contacts', 'contacts.contact-list')->name('contacts.index');
+
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
             when(

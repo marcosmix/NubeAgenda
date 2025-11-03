@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -14,13 +14,12 @@ return new class extends Migration {
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('agenda')->nullable();
-            $table->string('reason');
-            $table->string('location')->nullable();
-            $table->timestamp('starts_at');
-            $table->timestamp('ends_at');
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('category');
+            $table->foreignId('reason_id')->nullable();
             $table->string('visibility')->default('private');
-            $table->foreignIdFor(User::class, 'created_by');
             $table->timestamps();
         });
     }

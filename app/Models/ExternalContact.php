@@ -4,30 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ExternalContact extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'meeting_id',
         'name',
         'email',
         'phone',
-        'position',
-        'company',
-        'photo_path',
+        'organization',
     ];
 
-    public function meeting(): BelongsTo
-    {
-        return $this->belongsTo(Meeting::class);
-    }
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email' => 'string',
+        'phone' => 'string',
+        'organization' => 'string',
+    ];
 
-    public function getPhotoUrlAttribute(): string
+    /**
+     * Meetings that include the contact.
+     */
+    public function meetings(): BelongsToMany
     {
-        return Storage::disk('public')->url($this->photo_path);
+        return $this->belongsToMany(Meeting::class, 'external_contact_meeting')->withTimestamps();
     }
 }

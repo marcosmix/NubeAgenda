@@ -112,4 +112,20 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Corporate Email Domains
+    |--------------------------------------------------------------------------
+    |
+    | Defines the list of corporate email domains that are permitted for
+    | authentication and registration flows. A comma-separated list can be
+    | provided via the environment variable.
+    |
+    */
+
+    'corporate_domains' => array_values(array_filter(array_map(
+        static fn ($domain) => trim((string) $domain),
+        explode(',', (string) env('CORPORATE_EMAIL_DOMAINS', 'nubeagenda.com')),
+    ))),
+
 ];

@@ -2,64 +2,69 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Meeting extends Model
 {
     use HasFactory;
 
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_CANCELLED = 'cancelled';
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'user_id',
         'title',
-        'description',
-        'location',
-        'start_at',
-        'end_at',
-        'status',
-        'external_contact_email',
-        'external_contact_name',
-        'google_event_id',
-        'google_synced_at',
+        'date',
+        'start_time',
+        'end_time',
+        'category',
+        'reason_id',
+        'visibility',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
-        'start_at' => 'datetime',
-        'end_at' => 'datetime',
-        'google_synced_at' => 'datetime',
+        'date' => 'immutable_date',
     ];
 
-    public function user(): BelongsTo
+    /**
+     * Accessor for the meeting start time.
+     */
+    protected function startTime(): Attribute
     {
-        return $this->belongsTo(User::class);
+        return Attribute::make(
+            get: static fn (?string $value): ?CarbonImmutable => $value
+                ? CarbonImmutable::createFromFormat('H:i:s', $value)
+                : null,
+        );
     }
 
-    public function isConfirmed(): bool
+    /**
+     * Accessor for the meeting end time.
+     */
+    protected function endTime(): Attribute
     {
-        return $this->status === self::STATUS_CONFIRMED;
+        return Attribute::make(
+            get: static fn (?string $value): ?CarbonImmutable => $value
+                ? CarbonImmutable::createFromFormat('H:i:s', $value)
+                : null,
+        );
     }
 
-    public function hasExternalContact(): bool
+    /**
+     * Users responsible for the meeting.
+     */
+    public function responsibles(): BelongsToMany
     {
-        return ! empty($this->external_contact_email);
-    }
-
-    public function shouldSyncToGoogle(): bool
-    {
-        return $this->isConfirmed() && $this->hasExternalContact();
-    }
-
-    public function markSynced(?string $eventId): void
-    {
-        $this->forceFill([
-            'google_event_id' => $eventId,
-            'google_synced_at' => Carbon::now(),
-        ])->save();
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 }

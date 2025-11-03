@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Meeting;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -22,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'gmail',
+        'google_api_key',
         'password',
         'google_access_token',
         'google_refresh_token',
@@ -69,21 +75,11 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function hasValidGoogleAccessToken(): bool
+    /**
+     * Meetings where the user is registered as responsible.
+     */
+    public function responsibleMeetings(): BelongsToMany
     {
-        if (empty($this->google_access_token)) {
-            return false;
-        }
-
-        if (empty($this->google_token_expires_at)) {
-            return true;
-        }
-
-        return $this->google_token_expires_at->isFuture();
-    }
-
-    public function prefersGoogleCalendarSync(): bool
-    {
-        return ! empty($this->google_refresh_token) || ! empty($this->google_access_token);
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
     }
 }

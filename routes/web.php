@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('meetings/agenda', 'meetings.agenda')->name('meetings.agenda');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(

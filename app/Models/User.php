@@ -23,6 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_access_token',
+        'google_refresh_token',
+        'google_token_expires_at',
+        'google_calendar_id',
     ];
 
     /**
@@ -35,6 +39,8 @@ class User extends Authenticatable
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+        'google_access_token',
+        'google_refresh_token',
     ];
 
     /**
@@ -47,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'google_token_expires_at' => 'datetime',
         ];
     }
 
@@ -60,5 +67,23 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    public function hasValidGoogleAccessToken(): bool
+    {
+        if (empty($this->google_access_token)) {
+            return false;
+        }
+
+        if (empty($this->google_token_expires_at)) {
+            return true;
+        }
+
+        return $this->google_token_expires_at->isFuture();
+    }
+
+    public function prefersGoogleCalendarSync(): bool
+    {
+        return ! empty($this->google_refresh_token) || ! empty($this->google_access_token);
     }
 }

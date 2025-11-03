@@ -71,4 +71,6 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Volt::route('meetings/reasons', 'meetings.reasons')->name('meetings.reasons');
 });

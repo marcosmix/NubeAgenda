@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Meeting;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'gmail',
+        'google_api_key',
         'password',
     ];
 
@@ -66,18 +69,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Meetings where the user is marked as responsible.
+     * Meetings where the user is registered as responsible.
      */
-    public function meetings(): BelongsToMany
+    public function responsibleMeetings(): BelongsToMany
     {
-        return $this->belongsToMany(Meeting::class, 'meeting_user')->withTimestamps();
-    }
-
-    /**
-     * Meetings created by the user.
-     */
-    public function createdMeetings(): HasMany
-    {
-        return $this->hasMany(Meeting::class, 'created_by');
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
     }
 }

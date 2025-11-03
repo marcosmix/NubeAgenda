@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Meeting extends Model
@@ -18,13 +19,12 @@ class Meeting extends Model
      */
     protected $fillable = [
         'title',
-        'agenda',
-        'reason',
-        'location',
-        'starts_at',
-        'ends_at',
+        'date',
+        'start_time',
+        'end_time',
+        'category',
+        'reason_id',
         'visibility',
-        'created_by',
     ];
 
     /**
@@ -33,31 +33,38 @@ class Meeting extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
+        'date' => 'immutable_date',
     ];
 
     /**
-     * Meeting creator relationship.
+     * Accessor for the meeting start time.
      */
-    public function creator(): BelongsTo
+    protected function startTime(): Attribute
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return Attribute::make(
+            get: static fn (?string $value): ?CarbonImmutable => $value
+                ? CarbonImmutable::createFromFormat('H:i:s', $value)
+                : null,
+        );
     }
 
     /**
-     * Meeting responsibles relationship.
+     * Accessor for the meeting end time.
+     */
+    protected function endTime(): Attribute
+    {
+        return Attribute::make(
+            get: static fn (?string $value): ?CarbonImmutable => $value
+                ? CarbonImmutable::createFromFormat('H:i:s', $value)
+                : null,
+        );
+    }
+
+    /**
+     * Users responsible for the meeting.
      */
     public function responsibles(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'meeting_user')->withTimestamps();
-    }
-
-    /**
-     * Meeting external contacts relationship.
-     */
-    public function externalContacts(): BelongsToMany
-    {
-        return $this->belongsToMany(ExternalContact::class, 'external_contact_meeting')->withTimestamps();
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 }

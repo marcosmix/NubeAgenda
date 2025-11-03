@@ -19,6 +19,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 
+    Volt::route('meetings/create', 'meetings.create-meeting')->name('meetings.create');
+
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
             when(
